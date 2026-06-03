@@ -37,6 +37,11 @@ cv::Vec3d phg::Calibration::project(const cv::Vec3d &point) const
 
     // TODO 11: добавьте учет радиальных искажений (k1_, k2_) (после деления на Z, но до умножения на f)
 
+    double r_2 = x * x + y * y;
+    double dist = 1.f + k1_ * r_2 + k2_ * r_2 * r_2;
+
+    x *= dist;
+    y *= dist;
 
     x *= f_;
     y *= f_;
@@ -56,6 +61,10 @@ cv::Vec3d phg::Calibration::unproject(const cv::Vec2d &pixel) const
     y /= f_;
 
     // TODO 12: добавьте учет радиальных искажений, когда реализуете - подумайте: почему строго говоря это - не симметричная формула формуле из project? (но лишь приближение)
+    double r_2 = x * x + y * y;
+    double undist = -k2_ * r_2 * r_2 - k1_ * r_2 + 1.f;
+    x *= undist;
+    y *= undist;
 
     return cv::Vec3d(x, y, 1.0);
 }
